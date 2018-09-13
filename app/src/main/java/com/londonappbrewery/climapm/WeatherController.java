@@ -2,6 +2,7 @@ package com.londonappbrewery.climapm;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -57,13 +59,20 @@ public class WeatherController extends AppCompatActivity {
         setContentView(R.layout.weather_controller_layout);
 
         // Linking the elements in the layout to Java code
-        mCityLabel = (TextView) findViewById(R.id.locationTV);
-        mWeatherImage = (ImageView) findViewById(R.id.weatherSymbolIV);
-        mTemperatureLabel = (TextView) findViewById(R.id.tempTV);
-        ImageButton changeCityButton = (ImageButton) findViewById(R.id.changeCityButton);
+        mCityLabel                      = findViewById(R.id.locationTV);
+        mWeatherImage                   = findViewById(R.id.weatherSymbolIV);
+        mTemperatureLabel               = findViewById(R.id.tempTV);
+        ImageButton changeCityButton    = findViewById(R.id.changeCityButton);
 
 
         // TODO: Add an OnClickListener to the changeCityButton here:
+        changeCityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(WeatherController.this, ChangeCityController.class);
+                startActivity(myIntent);
+            }
+        });
 
     }
 
@@ -155,6 +164,7 @@ public class WeatherController extends AppCompatActivity {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("Clima","Success! JSON: "+response.toString());
                 WeatherDataModel weatherData = WeatherDataModel.fromJson(response);
+                updateUI(weatherData);
             }
 
             @Override
@@ -169,6 +179,13 @@ public class WeatherController extends AppCompatActivity {
 
 
     // TODO: Add updateUI() here:
+    private void updateUI(WeatherDataModel weather){
+        mTemperatureLabel.setText(weather.getTemperature());
+        mCityLabel.setText(weather.getCity());
+        int resourceID = getResources().getIdentifier(weather.getIconName(),"drawable",getPackageName());
+        mWeatherImage.setImageResource(resourceID);
+
+    }
 
 
 
